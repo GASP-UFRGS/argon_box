@@ -43,7 +43,8 @@ from Geant4 import G4RandomDirection, HepRandom
 # G4 Configuration
 from Geant4 import G4UserLimits
 # Pre-defined NIST materials
-import g4py.NISTmaterials
+#import g4py.NISTmaterials
+from G4materials import *
 
 # General tools
 from copy import copy
@@ -280,9 +281,14 @@ class MySimulation:
         HepRandom.setTheSeed(self._random_seed)
         return
 
+# FIXME
+# moving g4py to latest py3 Geant4 package
+# https://indico.cern.ch/event/3190/contributions/737950/attachments/613730/844397/g4py-parallel-lisboa06.pdf
+# NIST materials not working
     def _init_materials(self):
         '''Prepare list of materials'''
-        g4py.NISTmaterials.Construct()
+        #g4py.NISTmaterials.Construct()
+        G4materials.Construct()
         # Define liquid argon (name,z,a,density)
         LAr_mat = G4Material("liquidArgon", 18., 39.95*g/mole, 1.390*g/cm3)
         self._materials['liquidArgon'] = LAr_mat
