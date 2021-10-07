@@ -151,15 +151,15 @@ class MySimulation:
             self._include_edepsim = True
         if self._args.edep_step:
             self._edep_step = self._args.edep_step
-        print "Configuration:"
-        print "  nevents:",self._nevents
-        print "   source:",self._source
-        print "   energies:",self._energies
-        print "   output:",self._ofilename
-        print " physlist:",self._physlist_name
-        print "     seed:",self._random_seed
-        print "  edepsim:",self._include_edepsim
-        print " edepstep:",self._edep_step
+        print( "Configuration:" )
+        print( "  nevents:",self._nevents )
+        print( "   source:",self._source )
+        print( "   energies:",self._energies )
+        print( "   output:",self._ofilename )
+        print( " physlist:",self._physlist_name )
+        print( "     seed:",self._random_seed )
+        print( "  edepsim:",self._include_edepsim )
+        print( " edepstep:",self._edep_step )
         return
 
     def _prepare_output(self):
@@ -480,8 +480,8 @@ class MyHepEvtGeneratorAction(G4VUserPrimaryGeneratorAction):
         # Prepare generator
         datalines = open(self.inputFile).readlines()
         self.hepEvts = self.parseHepEvts(datalines) 
-        print 'HepEVT Generator: Loaded %d events from %s' % (
-            len(self.hepEvts), self.inputFile)
+        print('HepEVT Generator: Loaded %d events from %s' % (
+            len(self.hepEvts), self.inputFile))
         self.isInitialized = True
         return
 
@@ -585,9 +585,9 @@ class MyRunAction(G4UserRunAction):
     "My Run Action"
 
     def EndOfRunAction(self, run):
-        print "*** End of Run"
-        print "- Run sammary : (id= %d, #events= %d)" \
-            % (run.GetRunID(), run.GetNumberOfEventToBeProcessed())
+        print("*** End of Run")
+        print("- Run sammary : (id= %d, #events= %d)" \
+            % (run.GetRunID(), run.GetNumberOfEventToBeProcessed()))
 
 # ------------------------------------------------------------------
 class MyEventAction(G4UserEventAction):
@@ -659,7 +659,7 @@ class MyEventAction(G4UserEventAction):
                 tb.mi[ni] = pmass / GeV
                 ni += 1
                 if ni == tb.maxInit:
-                    print "Warning: Reached max number of initial particles."
+                    print("Warning: Reached max number of initial particles.")
                     break
         tb.ni[0] = ni
         self._otree.Fill()
@@ -682,7 +682,7 @@ class MySteppingAction(G4UserSteppingAction):
         tb = self._tb
         istp = tb.nstep[0]
         if istp>=tb.maxTracks:
-            print 'Reached maximum tracks:',istp
+            print('Reached maximum tracks:',istp)
             return
         track = step.GetTrack()
         prestep = step.GetPreStepPoint()
