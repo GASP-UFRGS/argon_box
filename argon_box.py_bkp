@@ -43,7 +43,10 @@ from Geant4 import G4RandomDirection, HepRandom
 # G4 Configuration
 from Geant4 import G4UserLimits
 # Pre-defined NIST materials
-import g4py.NISTmaterials
+#import g4py.NISTmaterials
+from Geant4 import gNistManager
+
+import sys
 
 # General tools
 from copy import copy
@@ -151,15 +154,15 @@ class MySimulation:
             self._include_edepsim = True
         if self._args.edep_step:
             self._edep_step = self._args.edep_step
-        print "Configuration:"
-        print "  nevents:",self._nevents
-        print "   source:",self._source
-        print "   energies:",self._energies
-        print "   output:",self._ofilename
-        print " physlist:",self._physlist_name
-        print "     seed:",self._random_seed
-        print "  edepsim:",self._include_edepsim
-        print " edepstep:",self._edep_step
+        print( "Configuration:" )
+        print( "  nevents:",self._nevents )
+        print( "   source:",self._source )
+        print( "   energies:",self._energies )
+        print( "   output:",self._ofilename )
+        print( " physlist:",self._physlist_name )
+        print( "     seed:",self._random_seed )
+        print( "  edepsim:",self._include_edepsim )
+        print( " edepstep:",self._edep_step )
         return
 
     def _prepare_output(self):
@@ -280,12 +283,20 @@ class MySimulation:
         HepRandom.setTheSeed(self._random_seed)
         return
 
+# GGS (UFRGS)
+# FIXME
+# moving g4py to latest py3 Geant4 package
+# https://indico.cern.ch/event/3190/contributions/737950/attachments/613730/844397/g4py-parallel-lisboa06.pdf
+# NIST materials not working
     def _init_materials(self):
         '''Prepare list of materials'''
-        g4py.NISTmaterials.Construct()
+#        g4py.NISTmaterials.Construct()
+#        LAr_mat = gNistManager.FindOrBuildMaterial("G4_AIR")
         # Define liquid argon (name,z,a,density)
         LAr_mat = G4Material("liquidArgon", 18., 39.95*g/mole, 1.390*g/cm3)
         self._materials['liquidArgon'] = LAr_mat
+#        print(self._materials)
+#        sys.exit()
         return
 
     def _init_geometry(self):
@@ -372,7 +383,8 @@ class MyDetectorConstruction(G4VUserDetectorConstruction):
         # World (box of liquid argon)
         world_s = G4Box("World", 100*m, 100*m, 100*m)
         world_l = G4LogicalVolume(world_s, self.materials['liquidArgon'],
-                                  "World")
+# GGS (UFRGS)
+#        world_l = G4LogicalVolume(world_s, gNistManager.FindOrBuildMaterial("G4_lAr"), "World")
         world_p = G4PVPlacement(None,                  #no rotation
                                 G4ThreeVector(),       #at (0,0,0)
                                 world_l,               #its logical volume
@@ -480,8 +492,8 @@ class MyHepEvtGeneratorAction(G4VUserPrimaryGeneratorAction):
         # Prepare generator
         datalines = open(self.inputFile).readlines()
         self.hepEvts = self.parseHepEvts(datalines) 
-        print 'HepEVT Generator: Loaded %d events from %s' % (
-            len(self.hepEvts), self.inputFile)
+        print('HepEVT Generator: Loaded %d events from %s' % (
+            len(self.hepEvts), self.inputFile))
         self.isInitialized = True
         return
 
@@ -585,9 +597,9 @@ class MyRunAction(G4UserRunAction):
     "My Run Action"
 
     def EndOfRunAction(self, run):
-        print "*** End of Run"
-        print "- Run sammary : (id= %d, #events= %d)" \
-            % (run.GetRunID(), run.GetNumberOfEventToBeProcessed())
+        print("*** End of Run")
+        print("- Run sammary : (id= %d, #events= %d)" \
+            % (run.GetRunID(), run.GetNumberOfEventToBeProcessed()))
 
 # ------------------------------------------------------------------
 class MyEventAction(G4UserEventAction):
@@ -659,7 +671,7 @@ class MyEventAction(G4UserEventAction):
                 tb.mi[ni] = pmass / GeV
                 ni += 1
                 if ni == tb.maxInit:
-                    print "Warning: Reached max number of initial particles."
+                    print("Warning: Reached max number of initial particles.")
                     break
         tb.ni[0] = ni
         self._otree.Fill()
@@ -682,7 +694,7 @@ class MySteppingAction(G4UserSteppingAction):
         tb = self._tb
         istp = tb.nstep[0]
         if istp>=tb.maxTracks:
-            print 'Reached maximum tracks:',istp
+#            print('Reached maximum tracks:',istp)
             return
         track = step.GetTrack()
         prestep = step.GetPreStepPoint()
